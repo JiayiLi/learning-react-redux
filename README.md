@@ -8,4 +8,6 @@
 ![目录结构](images/image.png)<br>
 react 为源码<br>
 react-note 为注释版源码<br>
+README.md 为总结综述
+
 
