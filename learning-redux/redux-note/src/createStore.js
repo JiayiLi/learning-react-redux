@@ -1,7 +1,7 @@
 import $$observable from 'symbol-observable'
 
-import ActionTypes from './utils/actionTypes'
-import isPlainObject from './utils/isPlainObject'
+import ActionTypes from './utils/actionTypes' // 工具库
+import isPlainObject from './utils/isPlainObject' // 工具库
 
 /**
  * Creates a Redux store that holds the state tree.
@@ -27,6 +27,19 @@ import isPlainObject from './utils/isPlainObject'
  *
  * @returns {Store} A Redux store that lets you read the state, dispatch actions
  * and subscribe to changes.
+ */
+
+/**
+ * createStore 方法主要用来 创建一个 redux store 用来存放 state。
+ * 唯一可以改变 store 中数据的方法就是调用 dispatch() 方法。
+ * 在你的 app 中，应该只有一个 store。为了在这一个 store 中回应不同 action，你可能需要多个 reducer ，然后利用 combineReducers 方法将多个 reducer 合并生成一个最终的 reducer。
+ * createStore 参数说明：
+ *    reducer：一个方法。告诉它现有的 state，以及将如何改变这个 state，最后返回新的 state。
+ *    preloadedState：初始化 state。 ?????
+ *    enhancer：用来丰富 store。你可以选择性的通过 第三方工具像中间件、time travel、persistence等来定义它。redux 中唯一一个用来丰富 store 的方法是 applyMiddleware。
+ * createStore 将返回：
+ *    一个可供你查看 state、出发 actions 、订阅变化的 redux store 。
+ * 
  */
 export default function createStore(reducer, preloadedState, enhancer) {
   if (typeof preloadedState === 'function' && typeof enhancer === 'undefined') {
