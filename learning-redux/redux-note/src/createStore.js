@@ -35,36 +35,48 @@ import isPlainObject from './utils/isPlainObject' // 工具库
  * 在你的 app 中，应该只有一个 store。为了在这一个 store 中回应不同 action，你可能需要多个 reducer ，然后利用 combineReducers 方法将多个 reducer 合并生成一个最终的 reducer。
  * createStore 参数说明：
  *    reducer：一个方法。告诉它现有的 state，以及将如何改变这个 state，最后返回新的 state。
- *    preloadedState：初始化 state。 ?????
- *    enhancer：用来丰富 store。你可以选择性的通过 第三方工具像中间件、time travel、persistence等来定义它。redux 中唯一一个用来丰富 store 的方法是 applyMiddleware。
+ *    preloadedState：初始化 state。但是如果使用 combineReducers 来生成 reducer，那必须保持状态对象的 key 和 combineReducers 中的 key 相对应；
+ *    enhancer：一个方法用来丰富 store。你可以选择性的通过 第三方工具像中间件、time travel、persistence等来定义它。9999这个函数只能用 Redux 提供的 applyMiddleware 函数来生成。
  * createStore 将返回：
  *    一个可供你查看 state、出发 actions 、订阅变化的 redux store 。
  * 
  */
 export default function createStore(reducer, preloadedState, enhancer) {
+  // 如果 preloadedState 是一个 function，并且用户没有传 enhancer 参数，则 preloadedState 就是 enhancer，preloadedState 设为 undefined
   if (typeof preloadedState === 'function' && typeof enhancer === 'undefined') {
     enhancer = preloadedState
     preloadedState = undefined
   }
 
+  // 如果传了 enhancer ，然而并不是 一个 function ，则报错 enhancer 必须是一个函数
+  // 如果是个函数，就直接调用他，进入中间件执行函数，并停止后面函数的执行。
   if (typeof enhancer !== 'undefined') {
     if (typeof enhancer !== 'function') {
       throw new Error('Expected the enhancer to be a function.')
     }
 
-    return enhancer(createStore)(reducer, preloadedState)
+    return enhancer(createStore)(reducer, preloadedState) // ???? 传入 createStore 来给它操作
   }
 
+  // 如果 reducer 不是一个 function，则报错 reducer必须是一个 function
   if (typeof reducer !== 'function') {
     throw new Error('Expected the reducer to be a function.')
   }
 
+  // 定义一些变量
+  //保存当前的 reducer
   let currentReducer = reducer
+  //保存当前的 state
   let currentState = preloadedState
+  // 保存监听列表
   let currentListeners = []
+  // 保存当前要监听的函数列表
   let nextListeners = currentListeners
+  // 标记是否被要调用，默认未被调用
   let isDispatching = false
 
+  // 生成 currentListeners 副本 复值给 nextListeners，确保两个引用地址不同，发生改变互不影响
+  // 这里要是有疑问的话，大家可以看一下 我的一篇关于深浅拷贝的文章：https://zhuanlan.zhihu.com/p/26282765
   function ensureCanMutateNextListeners() {
     if (nextListeners === currentListeners) {
       nextListeners = currentListeners.slice()
@@ -76,7 +88,9 @@ export default function createStore(reducer, preloadedState, enhancer) {
    *
    * @returns {any} The current state tree of your application.
    */
+  // getState 用来获取 store 中管理的 state 即当前的状态
   function getState() {
+    // 如果你在reducer执行的过程中在 store 上调用 getState 方法，请修改，因为 reducer 已经作为一个参数传进来了，可以从父级传下来而不是从 store 中读取。
     if (isDispatching) {
       throw new Error(
         'You may not call store.getState() while the reducer is executing. ' +
