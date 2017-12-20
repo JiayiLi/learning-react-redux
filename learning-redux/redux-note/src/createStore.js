@@ -72,7 +72,7 @@ export default function createStore(reducer, preloadedState, enhancer) {
   let currentListeners = []
   // 保存当前要监听的函数列表
   let nextListeners = currentListeners
-  // 标记是否被要调用，默认未被调用
+  // 标记是否被要调用，默认未被调用   ?????
   let isDispatching = false
 
   // 生成 currentListeners 副本 复值给 nextListeners，确保两个引用地址不同，发生改变互不影响
@@ -88,9 +88,9 @@ export default function createStore(reducer, preloadedState, enhancer) {
    *
    * @returns {any} The current state tree of your application.
    */
-  // getState 用来获取 store 中管理的 state 即当前的状态
+  // getState 用来获取 store 中管理的 state， 即当前的状态
   function getState() {
-    // 如果你在reducer执行的过程中在 store 上调用 getState 方法，请修改，因为 reducer 已经作为一个参数传进来了，可以从父级传下来而不是从 store 中读取。
+    // 如果你在 reducer 执行的过程中在 store 上调用 getState 方法，请修改，因为 reducer 已经作为一个参数传进来了，可以从父级传下来而不是从 store 中读取。
     if (isDispatching) {
       throw new Error(
         'You may not call store.getState() while the reducer is executing. ' +
@@ -125,11 +125,22 @@ export default function createStore(reducer, preloadedState, enhancer) {
    * @param {Function} listener A callback to be invoked on every dispatch.
    * @returns {Function} A function to remove this change listener.
    */
+  // 用来给 Store 添加监听其变化的函数。当一个 action 被 dispatch ，这个函数就会被调用，state 中可能有改变。你接下来可能需要在回调中调用getState 去获取新的state。
+
+  // 你可能需要从监听变化的方法上调用 dispatch() 方法，这有几点建议：
+  // 1、在每次调用 dispatch 方法之前，当时的订阅都会被记录，如果你在调用监听函数的过程中订阅或者是取消订阅，这个对正在进行的 dispatch() 函数没有任何影响。然而在下一次调用 dispatch ，无论是否嵌套（被之前的 dispatch 嵌套），都会用最新的订阅。
+  // 2、订阅不应该期望看到所有 state 上的变化，比如说在监听被调用之前，某个 state 有可能在嵌套的 dispatch 方法中被改变多次。所以就要确保所有被注册的订阅在调用 dispatch 之前 被调用。
+  // subscribe 参数说明：
+  //      listener：一个方法，一个在每次 dispatch 之前被调用的回调函数。
+  // subscribe 方法将返回：
+  //      一个方法，用来解绑当前传入的 监听函数。
   function subscribe(listener) {
+    // 监听者要求是一个函数
     if (typeof listener !== 'function') {
       throw new Error('Expected listener to be a function.')
     }
 
+    // 在 reducer 执行的过程中你不需要调用 store.subscribe()，如果你希望在 store 在更新后收到通知，你可以订阅一个 component，然后在回调中调用 store.getState() 获取最新的 state。
     if (isDispatching) {
       throw new Error(
         'You may not call store.subscribe() while the reducer is executing. ' +
@@ -139,27 +150,33 @@ export default function createStore(reducer, preloadedState, enhancer) {
       )
     }
 
+    // 标记变量，用来标志变量来判断当前的订阅是否已经被解绑。
     let isSubscribed = true
-
+    // 调用上面定义的 ensureCanMutateNextListeners 方法，nextListeners 的改变不影响 currentListeners。
     ensureCanMutateNextListeners()
+    // 然后在新的监控中添加当前传入的 新的需要监控函数
     nextListeners.push(listener)
 
+    // 返回一个取消订阅监听的函数
     return function unsubscribe() {
+      // 如果已经取消了，就直接返回
       if (!isSubscribed) {
         return
       }
-
+      // 你不应该在 reducer 正在执行的时候，取消订阅 store 监听。
       if (isDispatching) {
         throw new Error(
           'You may not unsubscribe from a store listener while the reducer is executing. ' +
             'See http://redux.js.org/docs/api/Store.html#subscribe for more details.'
         )
       }
-
+      // 将 标记变量 置为 false 
       isSubscribed = false
-
+      // 再次调用上面的 ensureCanMutateNextListeners 方法，又重新生成了 currentListeners 副本 复值给 nextListeners，确保两个引用地址不同，发生改变互不影响
       ensureCanMutateNextListeners()
+      // 获得当前传进来的 listener 的 index
       const index = nextListeners.indexOf(listener)
+      // 然后在 nextListeners 删除
       nextListeners.splice(index, 1)
     }
   }
@@ -189,6 +206,9 @@ export default function createStore(reducer, preloadedState, enhancer) {
    * Note that, if you use a custom middleware, it may wrap `dispatch()` to
    * return something else (for example, a Promise you can await).
    */
+  // dispatch 方法 用来 触发或者说调用一个 action，这是唯一改变 state 的方式
+
+  // reducer 函数 会在这个时候被调用，传参是 现在的 state 和 对应的 action。
   function dispatch(action) {
     if (!isPlainObject(action)) {
       throw new Error(
