@@ -198,7 +198,7 @@ export default function createStore(reducer, preloadedState, enhancer) {
    * @param {Object} action A plain object representing “what changed”. It is
    * a good idea to keep actions serializable so you can record and replay user
    * sessions, or use the time travelling `redux-devtools`. An action must have
-   * a `type` property which may not be `undefined`. It is a good idea to use
+   * a `type` property which may not be `undef ined`. It is a good idea to use
    * string constants for action types.
    *
    * @returns {Object} For convenience, the same action object you dispatched.
@@ -208,8 +208,17 @@ export default function createStore(reducer, preloadedState, enhancer) {
    */
   // dispatch 方法 用来 触发或者说调用一个 action，这是唯一改变 state 的方式
 
-  // reducer 函数 会在这个时候被调用，传参是 现在的 state 和 对应的 action。
+  // reducer 函数 会在这个时候被调用，传参是 现在的 state 和 对应的 action。reducer 返回的值 将会被作为新的状态，同时告知事件监听，我们这边有更新。
+
+  // dispatch 的基本参数是只支持简单的对象，如果你想要 dispatch 一个 Promise、 Observable、thunk 或者别的什么，你需要包装 创建store 的 function 到 合适的 中间件中。例如，你可以看一下redux-thunk 这个包。即使是中间件最终也会使用这种方法 dispatch 简单的对象操作。
+  // dispatch 参数介绍： 
+  //      action 一个简单的用来描述 什么东西变化了的对象。保持你的 actions 序列化是一个非常好的事情，这有助于你记录和回忆，或者你也可以使用 time travelling 工具 redux-devtools。 action 对象中必须要有 type 属性，值为字符串常量最好
+  // dispatch 函数将返回：
+  //      你传进来的 action 对象一样的对象
+
+  // 这里要注意的是，如果你用到一个 定制的中间件，他有可能会将 dispatch 包装起来，从而返回的其他东西（比如说一个你可以等待的 Promise）
   function dispatch(action) {
+    // 判断 action 类型，不是简单的对象就报错
     if (!isPlainObject(action)) {
       throw new Error(
         'Actions must be plain objects. ' +
@@ -217,19 +226,23 @@ export default function createStore(reducer, preloadedState, enhancer) {
       )
     }
 
+    // 如果 action 没有 type 属性，就报错
     if (typeof action.type === 'undefined') {
       throw new Error(
         'Actions may not have an undefined "type" property. ' +
           'Have you misspelled a constant?'
       )
     }
-
+    
+    // reducer 不要调用触发actions
     if (isDispatching) {
       throw new Error('Reducers may not dispatch actions.')
     }
 
     try {
+      // 设置 isDispatching 为 true；
       isDispatching = true
+      // 更新当前的state 为最新
       currentState = currentReducer(currentState, action)
     } finally {
       isDispatching = false
