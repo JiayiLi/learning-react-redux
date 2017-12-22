@@ -245,15 +245,18 @@ export default function createStore(reducer, preloadedState, enhancer) {
       // 更新当前的state 为最新
       currentState = currentReducer(currentState, action)
     } finally {
+      // 在 try 语句执行完之后 再将 isDispatching 置为false
       isDispatching = false
     }
 
+    // 执行当前的所有监听函数，告诉他们状态已经改变
     const listeners = (currentListeners = nextListeners)
     for (let i = 0; i < listeners.length; i++) {
       const listener = listeners[i]
       listener()
     }
 
+    // 返回传进来的 action
     return action
   }
 
@@ -267,12 +270,20 @@ export default function createStore(reducer, preloadedState, enhancer) {
    * @param {Function} nextReducer The reducer for the store to use instead.
    * @returns {void}
    */
+
+  //  替换当前store中使用的 reducer 来计算目前的state；简单来讲就是替换下一个reducer
+  //  可能用到这个方法的场景：如果你的应用代码是分离的然后你想手动加载 reducers；如果你为给想要 redux 热部署。
+  // replaceReducer参数说明：
+  //      nextReducer ：要替换的下一个 reducer；
+  // 这个方法什么也不返回
   function replaceReducer(nextReducer) {
+    // 类型判断 如果不是 function 报错
     if (typeof nextReducer !== 'function') {
       throw new Error('Expected the nextReducer to be a function.')
     }
-
+    // 然后 替换一下 reducer ，变成下一个
     currentReducer = nextReducer
+    // 然后触发 dispatch 改变 state 
     dispatch({ type: ActionTypes.REPLACE })
   }
 
@@ -282,6 +293,7 @@ export default function createStore(reducer, preloadedState, enhancer) {
    * For more information, see the observable proposal:
    * https://github.com/tc39/proposal-observable
    */
+  // ??????
   function observable() {
     const outerSubscribe = subscribe
     return {
@@ -293,7 +305,13 @@ export default function createStore(reducer, preloadedState, enhancer) {
        * be used to unsubscribe the observable from the store, and prevent further
        * emission of values from the observable.
        */
+
+      // subscribe 参数介绍：
+      //    可以被当作观察者的对象，这个观察者对象应该有一个 next 方法
+      // subscribe 方法将返回：
+      //     一个对象，他有取消订阅的方法可以用来从 store 中取消订阅。????
       subscribe(observer) {
+        // 检测参数类型
         if (typeof observer !== 'object') {
           throw new TypeError('Expected the observer to be an object.')
         }
@@ -318,6 +336,7 @@ export default function createStore(reducer, preloadedState, enhancer) {
   // When a store is created, an "INIT" action is dispatched so that every
   // reducer returns their initial state. This effectively populates
   // the initial state tree.
+  // 当一个创建一个 store 之后，一个 init 的 action 会被 dispatch，这样就使得每个 reducer 返回他们 state 的 初始值。这个就是用来完整整个初始化 state。
   dispatch({ type: ActionTypes.INIT })
 
   return {
