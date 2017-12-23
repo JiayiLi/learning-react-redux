@@ -54,8 +54,10 @@ export default function createStore(reducer, preloadedState, enhancer) {
     if (typeof enhancer !== 'function') {
       throw new Error('Expected the enhancer to be a function.')
     }
-
-    return enhancer(createStore)(reducer, preloadedState) // ???? 传入 createStore 来给它操作
+    // 返回 enhancer 丰富过后的 store
+    // enhancer 方法首先接收createStore作为参数，并且返回一个函数，这个函数接收的参数是reducer,preloadedState
+    // 这里利用了函数的柯里化 
+    return enhancer(createStore)(reducer, preloadedState) 
   }
 
   // 如果 reducer 不是一个 function，则报错 reducer必须是一个 function
@@ -72,7 +74,7 @@ export default function createStore(reducer, preloadedState, enhancer) {
   let currentListeners = []
   // 保存当前要监听的函数列表
   let nextListeners = currentListeners
-  // 标记是否被要调用，默认未被调用   ?????
+  // 标记是否正在更新当前的状态
   let isDispatching = false
 
   // 生成 currentListeners 副本 复值给 nextListeners，确保两个引用地址不同，发生改变互不影响
@@ -242,7 +244,7 @@ export default function createStore(reducer, preloadedState, enhancer) {
     try {
       // 设置 isDispatching 为 true；
       isDispatching = true
-      // 更新当前的state 为最新
+      // 更新当前的 state 为最新
       currentState = currentReducer(currentState, action)
     } finally {
       // 在 try 语句执行完之后 再将 isDispatching 置为false
@@ -293,8 +295,12 @@ export default function createStore(reducer, preloadedState, enhancer) {
    * For more information, see the observable proposal:
    * https://github.com/tc39/proposal-observable
    */
-  // ??????
+  // 预留给 observable/reactive 库的交互接口
+  // 此方法没有参数
+  // 此方法将返回 
+  //      observable： 表示 state 变化了的最小 observable 对象
   function observable() {
+    // 将我们上方的 subscribe 方法 暂存
     const outerSubscribe = subscribe
     return {
       /**
@@ -305,28 +311,33 @@ export default function createStore(reducer, preloadedState, enhancer) {
        * be used to unsubscribe the observable from the store, and prevent further
        * emission of values from the observable.
        */
-
+      // 一个最小的 observable 订阅方法
       // subscribe 参数介绍：
       //    可以被当作观察者的对象，这个观察者对象应该有一个 next 方法
       // subscribe 方法将返回：
-      //     一个对象，他有取消订阅的方法可以用来从 store 中取消订阅。????
+      //     一个对象，他有取消订阅的 unsubscribe 方法可以用来停止接收来自 store 中的状态变更信息。
       subscribe(observer) {
         // 检测参数类型
         if (typeof observer !== 'object') {
           throw new TypeError('Expected the observer to be an object.')
         }
 
+
         function observeState() {
+          // 如果 observer 有next 方法，则将当前最新的状态传给 observer
           if (observer.next) {
             observer.next(getState())
           }
         }
 
+        // 立即条用一次observeState，用来告知初始化状态
         observeState()
+        
+        // 取消订阅的函数 是上面定义的 subscribe ，subscribe函数会返回取消订阅当前当前传进来的订阅函数
         const unsubscribe = outerSubscribe(observeState)
         return { unsubscribe }
       },
-
+      // 顶部引入的 $$observable，根据 observable 协议，[Symbol.observable]()返回observable对象自身
       [$$observable]() {
         return this
       }
