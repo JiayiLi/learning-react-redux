@@ -350,6 +350,7 @@ export default function createStore(reducer, preloadedState, enhancer) {
   // 当一个创建一个 store 之后，一个 init 的 action 会被 dispatch，这样就使得每个 reducer 返回他们 state 的 初始值。这个就是用来完整整个初始化 state。
   dispatch({ type: ActionTypes.INIT })
 
+  // 暴露方法
   return {
     dispatch,
     subscribe,

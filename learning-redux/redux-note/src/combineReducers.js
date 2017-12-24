@@ -1,12 +1,17 @@
-import ActionTypes from './utils/actionTypes'
-import warning from './utils/warning'
-import isPlainObject from './utils/isPlainObject'
+import ActionTypes from './utils/actionTypes' // 工具库
+import warning from './utils/warning'  // 工具库
+import isPlainObject from './utils/isPlainObject' // 工具库
 
+// 如果没有获得对应的 state 报 undefined 错
 function getUndefinedStateErrorMessage(key, action) {
+  // 获得 action type
   const actionType = action && action.type
+  // 对 action 进行描述，如果有 action type 就用 action 「type」来描述，负责就用 一个 action
   const actionDescription =
     (actionType && `action "${String(actionType)}"`) || 'an action'
 
+  // 返回 报错信息 
+  // 你所给的 action type ,reducer 的 key 返回 undefined. 如果你想要忽略一个 action ，你必须传入一个明确返回上一个 state，如果你希望 这个 reducer 没有任何值，你可以返回一个 null 而不是 undefined；
   return (
     `Given ${actionDescription}, reducer "${key}" returned undefined. ` +
     `To ignore an action, you must explicitly return the previous state. ` +
@@ -14,6 +19,7 @@ function getUndefinedStateErrorMessage(key, action) {
   )
 }
 
+// 如果 没有获得期待的 state 值，报警告错
 function getUnexpectedStateShapeWarningMessage(
   inputState,
   reducers,
