@@ -26,12 +26,14 @@ function getUnexpectedStateShapeWarningMessage(
   action,
   unexpectedKeyCache
 ) {
+  // 存储所有的 reducers key
   const reducerKeys = Object.keys(reducers)
+
   const argumentName =
     action && action.type === ActionTypes.INIT
       ? 'preloadedState argument passed to createStore'
       : 'previous state received by the reducer'
-
+  // 如果 reducerKeys 中没有东西，代表有可能参数穿错了，或者别的什么问题，报错
   if (reducerKeys.length === 0) {
     return (
       'Store does not have a valid reducer. Make sure the argument passed ' +
@@ -39,6 +41,7 @@ function getUnexpectedStateShapeWarningMessage(
     )
   }
 
+  // 判断 inputState 是不是一个对象，如果不是报错
   if (!isPlainObject(inputState)) {
     return (
       `The ${argumentName} has unexpected type of "` +
@@ -48,16 +51,20 @@ function getUnexpectedStateShapeWarningMessage(
     )
   }
 
+  // 不期待的 key，即  state 中没有 reducer 中对应的 key，
   const unexpectedKeys = Object.keys(inputState).filter(
     key => !reducers.hasOwnProperty(key) && !unexpectedKeyCache[key]
   )
 
+  // 将不期待的 key 保存到 unexpectedKeys 中
   unexpectedKeys.forEach(key => {
     unexpectedKeyCache[key] = true
   })
 
+  // 如果 action.type 是 预留值 REPLACE，则直接返回
   if (action && action.type === ActionTypes.REPLACE) return
 
+  // 如果 unexpectedKeys 中有东西，也就是说有不期待的 key 就报错
   if (unexpectedKeys.length > 0) {
     return (
       `Unexpected ${unexpectedKeys.length > 1 ? 'keys' : 'key'} ` +
@@ -68,7 +75,10 @@ function getUnexpectedStateShapeWarningMessage(
   }
 }
 
+
+// 验证 Reducer 的合理性
 function assertReducerShape(reducers) {
+  // 遍历 reducers
   Object.keys(reducers).forEach(key => {
     const reducer = reducers[key]
     const initialState = reducer(undefined, { type: ActionTypes.INIT })
