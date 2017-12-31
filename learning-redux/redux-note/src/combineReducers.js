@@ -33,7 +33,8 @@ function getUnexpectedStateShapeWarningMessage(
     action && action.type === ActionTypes.INIT
       ? 'preloadedState argument passed to createStore'
       : 'previous state received by the reducer'
-  // 如果 reducerKeys 中没有东西，代表有可能参数穿错了，或者别的什么问题，报错
+
+  // 如果 reducerKeys 中没有东西，代表有可能参数传错了，或者别的什么问题，报错
   if (reducerKeys.length === 0) {
     return (
       'Store does not have a valid reducer. Make sure the argument passed ' +
@@ -64,7 +65,7 @@ function getUnexpectedStateShapeWarningMessage(
   // 如果 action.type 是 预留值 REPLACE，则直接返回
   if (action && action.type === ActionTypes.REPLACE) return
 
-  // 如果 unexpectedKeys 中有东西，也就是说有不期待的 key 就报错
+  // 如果 unexpectedKeys 中有东西，也就是说有不期待的 key ，就报错
   if (unexpectedKeys.length > 0) {
     return (
       `Unexpected ${unexpectedKeys.length > 1 ? 'keys' : 'key'} ` +
@@ -80,19 +81,23 @@ function getUnexpectedStateShapeWarningMessage(
 function assertReducerShape(reducers) {
   // 遍历 reducers
   Object.keys(reducers).forEach(key => {
+    // 保存每个 reducer；
     const reducer = reducers[key]
+    // 初始化调用reducer，返回初始化状态
     const initialState = reducer(undefined, { type: ActionTypes.INIT })
 
+    // 如果返回的初始化状态为undefined，报错：这个key的reducer在初始化的时候返回undefined，如果传给reducer 的state 是 undefined，你必须明确的返回最初的state。最初的state 可能不是undefined。如果你不想给这个reducer设置一个值，你可以使用 null 而不是undefined；
     if (typeof initialState === 'undefined') {
       throw new Error(
         `Reducer "${key}" returned undefined during initialization. ` +
           `If the state passed to the reducer is undefined, you must ` +
           `explicitly return the initial state. The initial state may ` +
           `not be undefined. If you don't want to set a value for this reducer, ` +
-          `you can use null instead of undefined.`
+          `you can use null instea d of undefined.`
       )
     }
 
+    // 生成一个随机的 type
     const type =
       '@@redux/PROBE_UNKNOWN_ACTION_' +
       Math.random()
@@ -100,6 +105,7 @@ function assertReducerShape(reducers) {
         .substring(7)
         .split('')
         .join('.')
+    // 用随机 action type 测试，如果得到的值是 undefined ，则报错：当用随机的type测试这个key的reducer时返回undefined
     if (typeof reducer(undefined, { type }) === 'undefined') {
       throw new Error(
         `Reducer "${key}" returned undefined when probed with a random type. ` +
