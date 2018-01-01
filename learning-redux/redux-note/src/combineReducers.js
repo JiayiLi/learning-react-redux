@@ -137,9 +137,22 @@ function assertReducerShape(reducers) {
  * @returns {Function} A reducer function that invokes every reducer inside the
  * passed object, and builds a state object with the same shape.
  */
+
+ /**
+  * 将一个其值是多个不同的reducer 函数，变为一个reducer 函数。这将会调用每个子 reducer，同时将他们的值收集到一
+  * 个 state 对象中，这个对象中的 key 对应所传的 reducer 函数的 key。
+  *
+  * combineReducers 参数：
+  *      reducers：一个对象，他的值对应不同的reducer函数，这些函数需要被合并为一个。一个简单的获得它的方法就是* * 用 es 6 的 `import * as reducers` 语法。reducers 可能永远不会对任何 action 返回 undefined。相反，如果* 传给他们的状态就是 undefined，他们应该返回他们最初的状态。
+  * combineReducers 将返回：
+  *      一个reducer函数：这个函数包括了所有传进来的 reducer 函数并建立一个形状相同的状态对象。
+  */
 export default function combineReducers(reducers) {
+  // 存储传进来的 reducer 的 key
   const reducerKeys = Object.keys(reducers)
+  // 生成的最终的 reducer
   const finalReducers = {}
+  // 循环遍历传进来的 reducerKeys，过滤掉不是一个函数的 reducer 存到 finalReducers 中
   for (let i = 0; i < reducerKeys.length; i++) {
     const key = reducerKeys[i]
 
@@ -149,55 +162,77 @@ export default function combineReducers(reducers) {
       }
     }
 
+    // 过滤不是函数的reducer
     if (typeof reducers[key] === 'function') {
       finalReducers[key] = reducers[key]
     }
   }
+  // 存储过滤后的 Reducer Key
   const finalReducerKeys = Object.keys(finalReducers)
-
+  // 定义变量存放不期待的key值；
   let unexpectedKeyCache
+  // 如果当前环境不是 production
   if (process.env.NODE_ENV !== 'production') {
+    // 初始化 存放不期待的key值的变量 为一个空对象
     unexpectedKeyCache = {}
   }
 
+  // 验证 reducer 是否合法
   let shapeAssertionError
   try {
     assertReducerShape(finalReducers)
   } catch (e) {
+    // 将错误存到shapeAssertionError中
     shapeAssertionError = e
   }
 
   return function combination(state = {}, action) {
+    // 如果有错误，就报错
     if (shapeAssertionError) {
       throw shapeAssertionError
     }
 
+    // 如果当前环境不是 production
     if (process.env.NODE_ENV !== 'production') {
+      // 检查是否没有获得期待的 state 值
       const warningMessage = getUnexpectedStateShapeWarningMessage(
         state,
         finalReducers,
         action,
         unexpectedKeyCache
       )
+      // 如果有警告错误，就报警告错误
       if (warningMessage) {
         warning(warningMessage)
       }
     }
 
+    // 定义并初始化变量 hasChanged = false
     let hasChanged = false
+    // 定义变量新的的state
     const nextState = {}
+    // 循环遍历 finalReducerKeys
     for (let i = 0; i < finalReducerKeys.length; i++) {
+      // 暂存 每一个 key
       const key = finalReducerKeys[i]
+      // 暂存 每一个 reducer
       const reducer = finalReducers[key]
+      // 当前 key 之前的状态
       const previousStateForKey = state[key]
+      // 调用 reducer 获取新的 state
       const nextStateForKey = reducer(previousStateForKey, action)
+      // 如果新的 state 是 undefined
       if (typeof nextStateForKey === 'undefined') {
+        // 获取 错误信息 并报错
         const errorMessage = getUndefinedStateErrorMessage(key, action)
         throw new Error(errorMessage)
       }
+      // 保存到新的 nextState 中
       nextState[key] = nextStateForKey
+      // 如果新旧 state  不一样，则代编已经变化了， 将变量 hasChanged 设为 true
       hasChanged = hasChanged || nextStateForKey !== previousStateForKey
     }
+    // 如果已经变化了，就返回新的 state，否则就是传进来的 state
     return hasChanged ? nextState : state
   }
 }
