@@ -1,4 +1,5 @@
-// actionCreator 是一个函数，接受参数并返回一个 action 对象
+// Action Creator 很简单，就是一个创建 action 的函数。不要混淆 action 和 action creator 这两个概念。Action 是一个信息的负载，而 action creator 是一个创建 action 的工厂。
+// 调用 action creator 只会生产 action，但不分发。你需要调用 store 的 dispatch function 才会引起变化。有时我们讲 bound action creator，是指一个函数调用了 action creator 并立即将结果分发给一个特定的 store 实例。
 function bindActionCreator(actionCreator, dispatch) {
   return function() {
     return dispatch(actionCreator.apply(this, arguments))
@@ -29,12 +30,13 @@ function bindActionCreator(actionCreator, dispatch) {
 
 
 // 将一个值为多个 action creators 的对象 转换成 具有相同 key 值，并将每个action creators函数包裹在 dispatch中，这样就可以直接被调用。这是一个非常方便的方法，你可以自己调用 `store.dispatch(MyActionCreators.doSomething())`。
-// 为了方便，您也可以穿一个单独的 函数 作为第一个参数，然后返回一个函数给你
+// 为了方便，您也可以穿一个单独的 函数 作为第一个参数，然后返回一个函数给你.
+// 惟一使用 bindActionCreators 的场景是当你需要把 action creator 往下传到一个组件上，却不想让这个组件觉察到 Redux 的存在，而且不希望把 Redux store 或 dispatch 传给它。
 // bindActionCreators 参数：
 //      actionCreators ： 一个对象，其值是多个 action creator 函数。一个简单的方法得到他是用 es6 中的 `import * as` 语法。你同样也可以只传一个函数。
 //      dispatch ： `dispatch` 函数 用在你的 redux store 上。
 // bindActionCreators 函数将返回：
-//      一个Function或者一个对象：这个对象模拟原始对象，但是将每个 action creator 包裹在 dispatch 中。如果你传递了一个 actionCreators 函数，同样将返回一个简单的函数
+//      一个Function或者一个对象：一个与原对象类似的对象，但是将每个 action creator 包裹在 dispatch 中。如果你传递了一个 actionCreators 函数，同样将返回一个简单的函数
 export default function bindActionCreators(actionCreators, dispatch) {
   // 如果actionCreators是一个函数，代表只传入了一个函数，则之间包裹返回
   if (typeof actionCreators === 'function') {
