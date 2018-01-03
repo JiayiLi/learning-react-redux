@@ -41,7 +41,7 @@ import compose from './compose'
 //      function：一个应用了 middleware 后的 store enhancer。
 export default function applyMiddleware(...middlewares) {
   return createStore => (...args) => {
-    // createStore(...args) 函数将返回一个新创建的 store
+    // createStore(...args) 函数将返回一个新创建的 store， 这里我们没有传入 enhancer ，所以这就是没有 enhancer 的 store ，即 原始 store。
     const store = createStore(...args)
   
     // 相当于 var dispatch = function dispatch() {}
@@ -56,14 +56,31 @@ export default function applyMiddleware(...middlewares) {
     let chain = []
 
     // middlewareAPI 的 api，每个中间件都支持 getState 和 dispatch 作为参数，这里将这两个要传入中间件的参数保存到 middlewareAPI 中
+    // 其中 dispatch: (...args) => dispatch(...args) 即
+    // var middlewareAPI = {
+    //   getState: store.getState,
+    //   dispatch: function dispatch() {
+    //     return _dispatch.apply(undefined, arguments);
+    //   }
+    // };
+    // _dispatch 即上面定义的 dispatch
     const middlewareAPI = {
       getState: store.getState,
       dispatch: (...args) => dispatch(...args)
     }
+
+    // 这里还有个知识点：我们编辑的中间件都是按照一定规律的，有固定传参顺序，
+    // 格式如下 const reduxMiddleware = ({dispatch, getState}[简化的store]) => (next[上一个中间件的dispatch方法]) => (action[实际派发的action对象]) => {}
+
+
     // 遍历每个 中间件 调用，并将 middlewareAPI 传入进去
+    // map() 方法创建一个新数组，其结果是该数组中的每个元素都调用一个提供的函数后返回的结果。
     chain = middlewares.map(middleware => middleware(middlewareAPI))
+    // 通过 compose(…chain) 可以将我们的中间件实现层层嵌套，最终形成(...args) =>middleware1(middleware2(middleware3(...args)))的效果。
+    // 再组合出新的 dispatch
     dispatch = compose(...chain)(store.dispatch)
 
+    // 最后 返回 store ，这个 store 里面用新的 dispatch 方法
     return {
       ...store,
       dispatch
