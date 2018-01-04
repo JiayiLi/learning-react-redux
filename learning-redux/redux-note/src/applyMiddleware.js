@@ -20,7 +20,6 @@ import compose from './compose'
 // 用法：
 // import { createStore, applyMiddleware } from 'redux';
 // import thunkMiddleware from 'redux-thunk';
-
 // const store = createStore(
 //       reducers,
 //       state,
@@ -45,7 +44,7 @@ export default function applyMiddleware(...middlewares) {
     const store = createStore(...args)
   
     // 相当于 var dispatch = function dispatch() {}
-    // 尝试调用 dispatch，看是否正在 dispatch，如果正在 dispatch，报错：不允许在构建中间件时进行 dispatch，其他中间件有可能不适用于此 dispatch。
+    // 初始化定义 dispatch
     let dispatch = () => {
       throw new Error(
         `Dispatching while constructing your middleware is not allowed. ` +
@@ -55,7 +54,7 @@ export default function applyMiddleware(...middlewares) {
     // 定义并初始化变量 chain 中间件链
     let chain = []
 
-    // middlewareAPI 的 api，每个中间件都支持 getState 和 dispatch 作为参数，这里将这两个要传入中间件的参数保存到 middlewareAPI 中
+    // middlewareAPI 的 api，每个中间件都支持 getState 和 dispatch 作为参数，这里先将这两个要传入中间件的参数保存到 middlewareAPI 中
     // 其中 dispatch: (...args) => dispatch(...args) 即
     // var middlewareAPI = {
     //   getState: store.getState,
@@ -63,7 +62,7 @@ export default function applyMiddleware(...middlewares) {
     //     return _dispatch.apply(undefined, arguments);
     //   }
     // };
-    // _dispatch 即上面定义的 dispatch
+    // _dispatch 即上面定义的 初始化定义的 dispatch
     const middlewareAPI = {
       getState: store.getState,
       dispatch: (...args) => dispatch(...args)
@@ -71,12 +70,14 @@ export default function applyMiddleware(...middlewares) {
 
     // 这里还有个知识点：我们编辑的中间件都是按照一定规律的，有固定传参顺序，
     // 格式如下 const reduxMiddleware = ({dispatch, getState}[简化的store]) => (next[上一个中间件的dispatch方法]) => (action[实际派发的action对象]) => {}
-
+    // 这里也用到了柯里化，而这里下面的 middlewares.map 就是先将中间件所需要的第一个参数 预置进去，即  ({dispatch, getState}[简化的store]) 
 
     // 遍历每个 中间件 调用，并将 middlewareAPI 传入进去
     // map() 方法创建一个新数组，其结果是该数组中的每个元素都调用一个提供的函数后返回的结果。
     chain = middlewares.map(middleware => middleware(middlewareAPI))
-    // 通过 compose(…chain) 可以将我们的中间件实现层层嵌套，最终形成(...args) =>middleware1(middleware2(middleware3(...args)))的效果。
+    // 通过 compose(…chain) 可以将我们的中间件实现层层嵌套，最终形成(...args) => middleware1(middleware2(middleware3(...args)))的效果。compose做的事情就是上一个函数的返回结果作为下一个函数的参数传入。
+    // 每个中间件 需要的 第二个参数 是 (next[上一个中间件的dispatch方法])，而这个 next  是下一个 中间件 执行完 返回的。 所以嵌套成了 middleware1(middleware2(middleware3(...args)))
+    // 最后  compose(...chain)(store.dispatch) 在传入一个 (store.dispatch) 作为第三个参数
     // 再组合出新的 dispatch
     dispatch = compose(...chain)(store.dispatch)
 
