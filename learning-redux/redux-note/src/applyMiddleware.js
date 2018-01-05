@@ -83,7 +83,10 @@ export default function applyMiddleware(...middlewares) {
     dispatch = compose(...chain)(store.dispatch)
     // 然后调用这个dispatch的时候就是 第三个参数 要处理的 action[实际派发的action对象]
 
-    // 最后 返回 store ，这个 store 里面用新的 dispatch 方法
+
+    // 每个middleware可以得到store的dispatch与getState为传参，最后会得到一个函数(function)型的action，然后以next(action)往下一个middleware执行。在连锁中的最后一个middleware将会得到真实的store的dispatch方法作为next的参数，以此结束整个连锁。
+
+    // 最后 返回 store ，这个 store 里面用新的 dispatch 方
     return {
       ...store,
       dispatch
