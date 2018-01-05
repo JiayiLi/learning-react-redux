@@ -212,7 +212,7 @@ export default function combineReducers(reducers) {
     let hasChanged = false
     // 定义变量新的的state
     const nextState = {}
-    // 循环遍历 finalReducerKeys
+    // 循环遍历 finalReducerKeys 
     for (let i = 0; i < finalReducerKeys.length; i++) {
       // 暂存 每一个 key
       const key = finalReducerKeys[i]

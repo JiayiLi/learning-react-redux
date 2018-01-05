@@ -42,7 +42,7 @@ export default function applyMiddleware(...middlewares) {
   return createStore => (...args) => {
     // createStore(...args) 函数将返回一个新创建的 store， 这里我们没有传入 enhancer ，所以这就是没有 enhancer 的 store ，即 原始 store。
     const store = createStore(...args)
-  
+
     // 相当于 var dispatch = function dispatch() {}
     // 初始化定义 dispatch
     let dispatch = () => {
@@ -72,14 +72,16 @@ export default function applyMiddleware(...middlewares) {
     // 格式如下 const reduxMiddleware = ({dispatch, getState}[简化的store]) => (next[上一个中间件的dispatch方法]) => (action[实际派发的action对象]) => {}
     // 这里也用到了柯里化，而这里下面的 middlewares.map 就是先将中间件所需要的第一个参数 预置进去，即  ({dispatch, getState}[简化的store]) 
 
-    // 遍历每个 中间件 调用，并将 middlewareAPI 传入进去
+    // 遍历每个 中间件 调用，并将第一个需要的参数 middlewareAPI 传入进去
     // map() 方法创建一个新数组，其结果是该数组中的每个元素都调用一个提供的函数后返回的结果。
     chain = middlewares.map(middleware => middleware(middlewareAPI))
     // 通过 compose(…chain) 可以将我们的中间件实现层层嵌套，最终形成(...args) => middleware1(middleware2(middleware3(...args)))的效果。compose做的事情就是上一个函数的返回结果作为下一个函数的参数传入。
     // 每个中间件 需要的 第二个参数 是 (next[上一个中间件的dispatch方法])，而这个 next  是下一个 中间件 执行完 返回的。 所以嵌套成了 middleware1(middleware2(middleware3(...args)))
-    // 最后  compose(...chain)(store.dispatch) 在传入一个 (store.dispatch) 作为第三个参数
+    // 然后紧跟 (store.dispatch) 即 middleware1(middleware2(middleware3(...args)))(store.dispatch)
+    // 调用刚才 compose(...chain) 返回的函数并传入第二个参数 store.dispatch 
     // 再组合出新的 dispatch
     dispatch = compose(...chain)(store.dispatch)
+    // 然后调用这个dispatch的时候就是 第三个参数 要处理的 action[实际派发的action对象]
 
     // 最后 返回 store ，这个 store 里面用新的 dispatch 方法
     return {
