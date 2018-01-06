@@ -73,11 +73,19 @@ export default function applyMiddleware(...middlewares) {
     // 每个中间件接收 getState 和 dispatch 作为参数，并返回一个函数，该函数会被传入下一个中间件的 dispatch 方法，并返回一个接收 action 的新函数。也就是三层。
     // 这里也用到了柯里化，而这里下面的 middlewares.map 就是先将中间件所需要的第一个参数 预置进去，即  ({dispatch, getState}[简化的store]) 
 
-    // 遍历每个 中间件 调用，并将第一个需要的参数 middlewareAPI 传入进去
+    // 遍历每个 中间件 调用，并将第一个需要的参数 middlewareAPI 传入进去得到返回值.
     // map() 方法创建一个新数组，其结果是该数组中的每个元素都调用一个提供的函数后返回的结果。
     chain = middlewares.map(middleware => middleware(middlewareAPI))
 
     // 通过 compose(…chain) 可以将我们的中间件实现层层嵌套，最终形成(...args) => middleware1(middleware2(middleware3(...args)))的效果。compose做的事情就是上一个函数的返回结果作为下一个函数的参数传入。
+    // 举例子：
+    // func -> [a, b, c, d];
+    // first: (...args) => a(b(...args))
+    // second: (...args) => first(c(...args)) 
+    // third: (...args) => second(d(...args))
+    // 而对于 someFunc1(someFunc2()) 会先执行 someFunc2() 因为他是 someFunc1 的参数，要先求出参数，在执行函数
+
+
     // 每个中间件 需要的 第二个参数 是 (next[上一个中间件的dispatch方法])，而这个 next  是下一个 中间件 执行完 返回的。 所以嵌套成了 middleware1(middleware2(middleware3(...args)))
     // 再组合出新的 dispatch
     dispatch = compose(...chain)(store.dispatch)
