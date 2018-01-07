@@ -73,7 +73,7 @@ export default function applyMiddleware(...middlewares) {
     // 每个中间件接收 getState 和 dispatch 作为参数，并返回一个函数，该函数会被传入下一个中间件的 dispatch 方法，并返回一个接收 action 的新函数。也就是三层。
     // 这里也用到了柯里化，而这里下面的 middlewares.map 就是先将中间件所需要的第一个参数 预置进去，即  ({dispatch, getState}[简化的store]) 
 
-    // 遍历每个 中间件 调用，并将第一个需要的参数 middlewareAPI 传入进去得到返回值.
+    // 遍历每个 中间件 调用，并将第一个需要的参数 middlewareAPI 传入进去得到返回值,这个返回值仍然是个函数，他需要 next 作为参数。
     // map() 方法创建一个新数组，其结果是该数组中的每个元素都调用一个提供的函数后返回的结果。
     chain = middlewares.map(middleware => middleware(middlewareAPI))
 
@@ -83,18 +83,34 @@ export default function applyMiddleware(...middlewares) {
     // first: (...args) => a(b(...args))
     // second: (...args) => first(c(...args)) 
     // third: (...args) => second(d(...args))
-    // 而对于 someFunc1(someFunc2()) 会先执行 someFunc2() 因为他是 someFunc1 的参数，要先求出参数，在执行函数
+    // 而对于 someFunc1(someFunc2()) 会先执行 someFunc2() 因为他是 someFunc1 的参数，要先求出参数，再执行函数。
+    // someFunc1(someFunc2()) 类似于 
+    // function () {
+    //   return a(b.apply(undefined, arguments));
+    // }
 
-
-    // 每个中间件 需要的 第二个参数 是 (next[上一个中间件的dispatch方法])，而这个 next  是下一个 中间件 执行完 返回的。 所以嵌套成了 middleware1(middleware2(middleware3(...args)))
-    // 再组合出新的 dispatch
+    // compose(...chain)(store.dispatch) 最后会转变为类似于 
+    // Middleware1(Middleware2(..args))(store.dispatch);
+    // 而对于 Middleware1(..blabla...)(someArgs) 这样的柯里化函数来说，外面的 (someArgs) 则是在调用 内部的 ..blabla... 并将 someArgs 传入进去。
+    // 而在上一步 chain 中 每个 middleware 已经预置了第一个参数，返回了一个函数，而这个函数正在等待第二个参数 也就是 next 的传入。
+    // 所以 Middleware1(Middleware2(..args))(store.dispatch)，(store.dispatch) 调用了 Middleware1，而 Middleware1 的执行依赖于内部参数的求值，所以会对内部参数进行调用，而 store.dispatch 将会传入其中，作为 Middleware2 （chian中最后一个middleware）的 next 参数。
+    // Middleware2 在接受store.dispatch作为 next 参数调用之后仍会返回一个函数，这个函数需要 action 作为第三个参数，
+    // 即
+    // action => {
+    //   // 中间件真正逻辑
+    // }
+    // 而 在Middleware2调用之前 Middleware1 是这样的
+    // next => action => {
+    //   ...一些 Middleware1 代码...
+    //   next(action);
+    //   ...一些 Middleware1 代码...
+    // }
+    // 然后在 Middleware2 调用之后， Middleware1 则接受了来自 Middleware2 返回的接受action为参数的函数 action => {} 作为 next 参数
+    // 然后这个 拼完next的结果，又会传给在下一个 等待  接受action为参数的函数 action => {} 作为下一个中间件的 next 参数
+    // 这样层层组装之后，就形成了我们增强过后的 dispatch
     dispatch = compose(...chain)(store.dispatch)
-    // 然后调用这个dispatch的时候就是 第三个参数 要处理的 action[实际派发的action对象]
 
-
-    // 每个middleware可以得到store的dispatch与getState为传参，最后会得到一个函数(function)型的action，然后以next(action)往下一个middleware执行。在连锁中的最后一个middleware将会得到真实的store的dispatch方法作为next的参数，以此结束整个连锁。
-
-    // 最后 返回 store ，这个 store 里面用新的 dispatch 方
+    // 最后 返回 store ，这个 store 里面用新的增强过的 dispatch 方法，然后在调用 dispatch（action） 传入action参数也就是中间件需要的第三个参数。
     return {
       ...store,
       dispatch
