@@ -8,7 +8,7 @@
  */
 
 'use strict';
-// 将定义好的每个模块引入
+// 引入模块方法
 var ReactBaseClasses = require('ReactBaseClasses');
 var ReactChildren = require('ReactChildren');
 var ReactDOMFactories = require('ReactDOMFactories');
@@ -23,11 +23,12 @@ var createElement = ReactElement.createElement;
 var createFactory = ReactElement.createFactory;
 var cloneElement = ReactElement.cloneElement;
 
+// 如果是开发环境，需要多引入几个模块方法，并且 createElement、createFactory等方法需要重新赋值
 if (__DEV__) {
-  var lowPriorityWarning = require('lowPriorityWarning');
-  var canDefineProperty = require('canDefineProperty');
-  var ReactElementValidator = require('ReactElementValidator');
-  var didWarnPropTypesDeprecated = false;
+  var lowPriorityWarning = require('lowPriorityWarning'); // 低优先级警告
+  var canDefineProperty = require('canDefineProperty'); // 可以定义属性值
+  var ReactElementValidator = require('ReactElementValidator'); // React元素验证器
+  var didWarnPropTypesDeprecated = false; 
   createElement = ReactElementValidator.createElement;
   createFactory = ReactElementValidator.createFactory;
   cloneElement = ReactElementValidator.cloneElement;
@@ -66,6 +67,7 @@ if (__DEV__) {
   };
 }
 
+// 将方法赋值给对象，然后暴露出去
 var React = {
   // Modern
 

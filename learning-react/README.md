@@ -1,3 +1,5 @@
+
+learn-react 目录结构 以下代码你可以从 [React/brach:15-stable](https://github.com/facebook/react/tree/15-stable) 上获得
 ```
 .
 ├── README.md   
