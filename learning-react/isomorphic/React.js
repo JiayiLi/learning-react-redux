@@ -8,7 +8,7 @@
  */
 
 'use strict';
-
+// 将定义好的每个模块引入
 var ReactBaseClasses = require('ReactBaseClasses');
 var ReactChildren = require('ReactChildren');
 var ReactDOMFactories = require('ReactDOMFactories');
