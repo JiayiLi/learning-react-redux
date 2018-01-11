@@ -6,6 +6,7 @@
  *
  * @providesModule ReactElement
  */
+// React 通过 createElement 方法将组件转成 ReactElement，并最终通过一系列操作渲染到页面成为HTMLElement。
 
 'use strict';
 
@@ -112,21 +113,26 @@ function defineRefPropWarningGetter(props, displayName) {
  * @param {*} props
  * @internal
  */
+// 使用工厂方法创建一个 react element，因为不是类形式的，所以不需要用 new 调用。同时，方法 instanceof 也不再适用。
+// 可以用 Symbol.for('react.element') 来检测一个是不是  React Element
 var ReactElement = function(type, key, ref, self, source, owner, props) {
   var element = {
     // This tag allow us to uniquely identify this as a React Element
+    // 这个标签允许我们唯一地标识这是一个React元素
     $$typeof: REACT_ELEMENT_TYPE,
 
     // Built-in properties that belong on the element
+    // 元素内置属性
     type: type,
     key: key,
     ref: ref,
     props: props,
 
     // Record the component responsible for creating this element.
+    // 记录负责这个元素的组件
     _owner: owner,
   };
-
+  // 如果是开发环境
   if (__DEV__) {
     // The validation flag is currently mutative. We put it on
     // an external backing store so that we can freeze the whole object.
@@ -178,6 +184,7 @@ var ReactElement = function(type, key, ref, self, source, owner, props) {
  * Create and return a new ReactElement of the given type.
  * See https://facebook.github.io/react/docs/top-level-api.html#react.createelement
  */
+// 根据给定的type 创建并返回 一个新的 ReactElement
 ReactElement.createElement = function(type, config, children) {
   var propName;
 
