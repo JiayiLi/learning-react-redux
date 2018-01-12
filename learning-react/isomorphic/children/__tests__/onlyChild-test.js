@@ -8,7 +8,7 @@
  */
 
 'use strict';
-
+// 测试 children
 describe('onlyChild', () => {
   var React;
   var ReactFragment;
