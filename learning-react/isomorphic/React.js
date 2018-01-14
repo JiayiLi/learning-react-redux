@@ -34,7 +34,9 @@ if (__DEV__) {
   cloneElement = ReactElementValidator.cloneElement;
 }
 
-var __spread = Object.assign;
+// object-assign方法用于将所有可枚举属性的值从一个或多个源对象复制到目标对象。它将返回目标对象。
+// object-assign mdn：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
+var __spread = Object.assign; 
 var createMixin = function(mixin) {
   return mixin;
 };

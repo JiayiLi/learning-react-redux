@@ -26,7 +26,7 @@ const createReactClass = require('createClass');
 const emptyObject = require('emptyObject');
 const invariant = require('invariant');
 
-const assign = require('object-assign');
+const assign = require('object-assign'); //object-assign方法用于将所有可枚举属性的值从一个或多个源对象复制到目标对象。它将返回目标对象。
 const pooledTransform = new Transform();
 
 // Utilities
