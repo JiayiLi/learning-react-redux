@@ -252,15 +252,20 @@ ReactElement.createElement = function(type, config, children) {
   }
 
   // Resolve default props
+  // 如果有 type 参数，并且 type 有 defaultProps
   if (type && type.defaultProps) {
+    // 先将 type.defaultProps 赋值给 一个变量 defaultProps
     var defaultProps = type.defaultProps;
+    // 然后循环，依次赋值给变量 props 上
     for (propName in defaultProps) {
       if (props[propName] === undefined) {
         props[propName] = defaultProps[propName];
       }
     }
   }
+  // 如果是 开发环境
   if (__DEV__) {
+    // 如果有 key 或者 ref 
     if (key || ref) {
       if (
         typeof props.$$typeof === 'undefined' ||
