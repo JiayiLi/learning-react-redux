@@ -138,12 +138,16 @@ var ReactElement = function(type, key, ref, self, source, owner, props) {
     // an external backing store so that we can freeze the whole object.
     // This can be replaced with a WeakMap once they are implemented in
     // commonly used development environments.
+    // element._store.validated用于存储子节点的校验值 
+    // 验证 flag 当前是可变的，我们把它保存到一个备用的 store 上，这样我们就可以冻结这个对象了。当环境一旦变成常用的开发环境的话，可以用WeakMap代替
     element._store = {};
 
     // To make comparing ReactElements easier for testing purposes, we make
     // the validation flag non-enumerable (where possible, which should
     // include every environment we run tests in), so the test framework
     // ignores it.
+    // 为了使ReactElements比较容易测试，我们使得验证 flag 不可枚举（如果可能的话，应该包括我们运行测试的每个环境），所以测试框架忽略它。
+    如果可以
     if (canDefineProperty) {
       Object.defineProperty(element._store, 'validated', {
         configurable: false,
