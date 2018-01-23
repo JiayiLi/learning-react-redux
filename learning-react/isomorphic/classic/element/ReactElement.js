@@ -27,9 +27,13 @@ var RESERVED_PROPS = {
 
 var specialPropKeyWarningShown, specialPropRefWarningShown;
 
+// 有可用的 ref
 function hasValidRef(config) {
+  // 如果实在测试环境下
   if (__DEV__) {
+    // config 有属性 ref
     if (hasOwnProperty.call(config, 'ref')) {
+      // Object.getOwnPropertyDescriptor() 方法返回指定对象上一个自有属性对应的属性描述符。（自有属性指的是直接赋予该对象的属性，不需要从原型链上进行查找的属性）
       var getter = Object.getOwnPropertyDescriptor(config, 'ref').get;
       if (getter && getter.isReactWarning) {
         return false;
