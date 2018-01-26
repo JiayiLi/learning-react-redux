@@ -6,8 +6,8 @@
  *
  * @providesModule ReactElement
  */
-// React 通过 createElement 方法将组件转成 ReactElement，并最终通过一系列操作渲染到页面成为HTMLElement。
 
+// React 通过 createElement 方法将组件转成 ReactElement，并最终通过一系列操作渲染到页面成为HTMLElement。
 'use strict';
 
 var ReactCurrentOwner = require('ReactCurrentOwner');
@@ -29,7 +29,7 @@ var specialPropKeyWarningShown, specialPropRefWarningShown;
 
 // 有可用的 ref
 function hasValidRef(config) {
-  // 如果实在测试环境下
+  // 如果是在测试环境下
   if (__DEV__) {
     // config 有属性 ref
     if (hasOwnProperty.call(config, 'ref')) {
@@ -43,6 +43,7 @@ function hasValidRef(config) {
   return config.ref !== undefined;
 }
 
+// 如果有可用的 key 值
 function hasValidKey(config) {
   if (__DEV__) {
     if (hasOwnProperty.call(config, 'key')) {
