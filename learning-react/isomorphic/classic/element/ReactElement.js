@@ -152,7 +152,7 @@ var ReactElement = function(type, key, ref, self, source, owner, props) {
     // include every environment we run tests in), so the test framework
     // ignores it.
     // 为了使ReactElements比较容易测试，我们使得验证 flag 不可枚举（如果可能的话，应该包括我们运行测试的每个环境），所以测试框架忽略它。
-    如果可以
+    // 如果可以自定义 object 的 Property
     if (canDefineProperty) {
       Object.defineProperty(element._store, 'validated', {
         configurable: false,
@@ -336,6 +336,7 @@ ReactElement.cloneAndReplaceKey = function(oldElement, newKey) {
  * Clone and return a new ReactElement using element as the starting point.
  * See https://facebook.github.io/react/docs/top-level-api.html#react.cloneelement
  */
+// 用来克隆并返回一个新的 ReactElement
 ReactElement.cloneElement = function(element, config, children) {
   var propName;
 
@@ -408,6 +409,7 @@ ReactElement.cloneElement = function(element, config, children) {
  * @return {boolean} True if `object` is a valid component.
  * @final
  */
+// 判断一个对象是否是 ReactElement
 ReactElement.isValidElement = function(object) {
   return (
     typeof object === 'object' &&
@@ -415,5 +417,5 @@ ReactElement.isValidElement = function(object) {
     object.$$typeof === REACT_ELEMENT_TYPE
   );
 };
-
+// 将 ReactElement 暴露出去
 module.exports = ReactElement;
