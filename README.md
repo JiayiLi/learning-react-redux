@@ -9,3 +9,5 @@
 react-note 为注释版源码<br>
 README.md 为对应的总结综述
 
+## Redux 知识点梳理
+- [【 js 基础 】【 源码学习 】柯里化和箭头函数](https://zhuanlan.zhihu.com/p/33374547)
