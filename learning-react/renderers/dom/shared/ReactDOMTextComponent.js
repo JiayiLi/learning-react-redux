@@ -6,6 +6,7 @@
  *
  * @providesModule ReactDOMTextComponent
  */
+// 对于文本类型的节点的渲染，Text Node虚拟dom转化为dom
 
 'use strict';
 
@@ -17,6 +18,10 @@ var escapeTextContentForBrowser = require('escapeTextContentForBrowser');
 var invariant = require('invariant');
 var validateDOMNesting = require('validateDOMNesting');
 
+// 文本节点违反了React关于组件的一些假设：
+//   当渲染文本到DOM，相邻的文本节点被合并。
+//   文本节点不能被分配一个React root ID。
+// 此组件用于包装在注释之间的字符串，使得它们的行为可以和其他 react 元素一样。
 /**
  * Text nodes violate a couple assumptions that React makes about components:
  *
@@ -32,6 +37,7 @@ var validateDOMNesting = require('validateDOMNesting');
  * @extends ReactComponent
  * @internal
  */
+// ReactDOMTextComponent 的构造函数
 var ReactDOMTextComponent = function(text) {
   // TODO: This is really a ReactText (ReactNode), not a ReactElement
   this._currentElement = text;
@@ -47,6 +53,7 @@ var ReactDOMTextComponent = function(text) {
   this._commentNodes = null;
 };
 
+// Object.assign() 方法用于将所有可枚举属性的值从一个或多个源对象复制到目标对象。它将返回目标对象。Object.assign(target, ...sources)；
 Object.assign(ReactDOMTextComponent.prototype, {
   /**
    * Creates the markup for this text node. This node is not intended to have
