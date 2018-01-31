@@ -43,10 +43,12 @@ var ReactDOMTextComponent = function(text) {
   this._currentElement = text;
   this._stringText = '' + text;
   // ReactDOMComponentTree uses these:
+  // ReactDOMComponentTree 需要用到这些
   this._hostNode = null;
   this._hostParent = null;
 
   // Properties
+  // 一些属性值
   this._domID = 0;
   this._mountIndex = 0;
   this._closingComment = null;
@@ -54,6 +56,7 @@ var ReactDOMTextComponent = function(text) {
 };
 
 // Object.assign() 方法用于将所有可枚举属性的值从一个或多个源对象复制到目标对象。它将返回目标对象。Object.assign(target, ...sources)；
+// 原型继承，在 ReactDOMTextComponent 的原型链上绑定方法，这样所有的ReactDOMTextComponent实例就都有这些方法。
 Object.assign(ReactDOMTextComponent.prototype, {
   /**
    * Creates the markup for this text node. This node is not intended to have
@@ -63,12 +66,16 @@ Object.assign(ReactDOMTextComponent.prototype, {
    * @return {string} Markup for this text node.
    * @internal
    */
+  // 为此文本节点创建标记。 除了包含文本内容之外，此节点不打算具有任何功能。
+
+  // mountComponent方法用来把虚拟dom转化成真实的dom
   mountComponent: function(
     transaction,
     hostParent,
     hostContainerInfo,
     context,
   ) {
+    // 如果是在开发环境下
     if (__DEV__) {
       var parentInfo;
       if (hostParent != null) {
@@ -133,14 +140,22 @@ Object.assign(ReactDOMTextComponent.prototype, {
    * @param {ReactReconcileTransaction} transaction
    * @internal
    */
+  // 通过更新文本内容来更新这个组件。
+  // 参数：
+  // nextText：下一个文本内容
   receiveComponent: function(nextText, transaction) {
+    // 如果下一个文本内容不是当前的，也就说有变化
     if (nextText !== this._currentElement) {
+      // 将新的文本赋值给当前的元素
       this._currentElement = nextText;
+      // 强制转换类型，将nextText转换为字符串形式
       var nextStringText = '' + nextText;
+      // 如果下一个文本内容和构造函数中保存的_stringText不一致
       if (nextStringText !== this._stringText) {
         // TODO: Save this as pending props and use performUpdateIfNecessary
         // and/or updateComponent to do the actual update for consistency with
         // other component types?
+        // 更新 构造函数 的 _stringText 属性为最新值
         this._stringText = nextStringText;
         var commentNodes = this.getHostNode();
         DOMChildrenOperations.replaceDelimitedText(
