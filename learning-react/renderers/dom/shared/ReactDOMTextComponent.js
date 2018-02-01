@@ -77,7 +77,9 @@ Object.assign(ReactDOMTextComponent.prototype, {
   ) {
     // 如果是在开发环境下
     if (__DEV__) {
+      // 父元素信息
       var parentInfo;
+      // 没有hostParent
       if (hostParent != null) {
         parentInfo = hostParent._ancestorInfo;
       } else if (hostContainerInfo != null) {
