@@ -82,6 +82,7 @@ Object.assign(ReactDOMTextComponent.prototype, {
       // 没有hostParent
       if (hostParent != null) {
         parentInfo = hostParent._ancestorInfo;
+      // 如果有 hostContainerInfo
       } else if (hostContainerInfo != null) {
         parentInfo = hostContainerInfo._ancestorInfo;
       }
@@ -142,7 +143,7 @@ Object.assign(ReactDOMTextComponent.prototype, {
    * @param {ReactReconcileTransaction} transaction
    * @internal
    */
-  // 通过更新文本内容来更新这个组件。
+  // 用新的 element 更新组件
   // 参数：
   // nextText：下一个文本内容
   receiveComponent: function(nextText, transaction) {
