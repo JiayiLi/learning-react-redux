@@ -41,3 +41,19 @@ renderers 文件夹中
 
 一些前提知识：
 同构模块：即服务端与客户端共用的模块
+
+
+## How to read React source code ?
+- 官方的一个引导文章：
+英文：[Codebase Overview](https://reactjs.org/docs/codebase-overview.html)
+中文：[Codebase Overview](http://www.css88.com/react/docs/codebase-overview.html)
+
+还是建议看英文原版，中文版有些地方由出入。
+
+部分译文：
+### React 核心
+核心代码包括了 React 顶级api，例如：
+- React.createElement()
+- React.Component
+- React.Children
+这些核心代码值包括了定义组件的必要 api，他并不包括一致性比较的算法，即 Reconciliation，或者是对一些设备平台进行特殊化处理的代码。而这些真正在文件中的核心 api 是用于 React DOM 和 React Native components.

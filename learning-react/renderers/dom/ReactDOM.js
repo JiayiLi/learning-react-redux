@@ -21,7 +21,14 @@ var ReactVersion = require('ReactVersion');
 var findDOMNode = require('findDOMNode');
 var getHostComponentFromComposite = require('getHostComponentFromComposite');
 var renderSubtreeIntoContainer = require('renderSubtreeIntoContainer');
-var warning = require('warning');
+// 一个用来提供警告的模块
+// 例子：
+// var warning = require('warning');
+// warning(
+//   2 + 2 === 4,
+//   'Math is not working today.'
+// );
+var warning = require('warning'); 
 
 ReactDefaultInjection.inject();
 
