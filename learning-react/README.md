@@ -56,4 +56,13 @@ renderers 文件夹中
 - React.createElement()
 - React.Component
 - React.Children
-这些核心代码值包括了定义组件的必要 api，他并不包括一致性比较的算法，即 Reconciliation，或者是对一些设备平台进行特殊化处理的代码。而这些真正在文件中的核心 api 是用于 React DOM 和 React Native components.
+这些核心代码值包括了定义组件的必要 api，他并不包括一致性比较的算法，即 [Reconciliation](http://www.css88.com/react/docs/reconciliation.html)，或者是对一些设备平台进行特殊化处理的代码。这些真正寸在文件中的核心 api 是用于 React DOM 和 React Native components.
+
+
+
+### 渲染器 Renderers
+渲染器 管理如何使一个 React tree 可以被底层平台调用。
+- React DOM Renderer 负责渲染 React 组件 为 Dom。它实现了顶级 ReactDom Api 并且作为 React-dom npm 包是有效的。它也可以被用作独立的浏览器插件react-dom.js并且导出一个全局ReactDOM。
+
+- React Native Renderer 负责渲染 React components 为 native views
+
