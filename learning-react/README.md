@@ -72,3 +72,7 @@ renderers 文件夹中
 ### Reconcilers
 即使是 React DOM 和 React Native 有很大的区别，但是他们还是会需要共享一些逻辑。所以在特殊的情况下， reconciliation 算法需要尽可能的相似，这样就可以使得声明式渲染，自定义 component，state，生命周期方法和 ref 仍然是在跨平台一致的。
 
+为了解决这一问题，不同的 renderers 互相共享一些相同的代码。我们称这部分 React 代码为 reconciler。当一个更新，例如 setState 被调度，这个 reconciler 调用在的 component 上的render() 去加载、更新、或卸载它们。
+
+Reconcilers 没有独立的包，因为它没有公用的 API。相反，它们只被渲染器使用例如 React DOM 和React Native。
+
