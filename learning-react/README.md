@@ -76,3 +76,12 @@ renderers 文件夹中
 
 Reconcilers 没有独立的包，因为它没有公用的 API。相反，它们只被渲染器使用例如 React DOM 和React Native。
 
+
+### Stack Reconciler
+Stack Reconciler 是给 React 15 及以前的版本进行使用的 Reconciler，我们已经停止使用他了，但是仍然有文章详细的记录了他。
+
+
+### Fiber Reconciler
+Fiber Reconciler 是一个新的努力去解决 stack reconciler 中固有的问题和一些长期存在的问题。他 React 16 的默认 Reconciler。
+
+它主要的目标是：
