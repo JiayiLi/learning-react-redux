@@ -85,3 +85,12 @@ Stack Reconciler 是给 React 15 及以前的版本进行使用的 Reconciler，
 Fiber Reconciler 是一个新的努力去解决 stack reconciler 中固有的问题和一些长期存在的问题。他 React 16 的默认 Reconciler。
 
 它主要的目标是：
+- 能够分块可中断工作的能力
+- 能够优先、复位和重用工作进程中的能力
+- 在父节点和子节点之间来回支持布局在React 中的能力
+- 从render() 中返回多个element 的能力
+- 更好支持错误边界
+
+
+### Event System
+React 实现了一个合成的事件系统，它是渲染器不可知的，在 React DOM 和 React Native 中工作。
