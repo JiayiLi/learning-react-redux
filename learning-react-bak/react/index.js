@@ -8,7 +8,7 @@
  */
 
 'use strict';
-
+// 入口文件，指向 src/React.js
 const React = require('./src/React');
 
 // TODO: decide on the top-level export form.
