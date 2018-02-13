@@ -35,8 +35,9 @@ import ReactDebugCurrentFrame from './ReactDebugCurrentFrame';
 
 // 定义一个对象，命名为 React ，上面挂在了所要暴露的所有方法，也就是 react 的所有方法。
 const React = {
+  // react children 相关的方法
   Children: {
-    map,
+    map, // React.Children.map(children, function[(thisArg)]) 在包含在 children 里的每个子级上调用函数，调用的函数的 this 设置为 thisArg 。如果 children 是一个嵌套的对象或数组，它将被遍历。如果 children 是 null 或 undefined ，返回 null 或 undefined 而不是一个空数组。
     forEach,
     count,
     toArray,
@@ -44,7 +45,11 @@ const React = {
   },
 
   createRef,
+  // React 组件可以让你把UI分割为独立、可复用的片段，并将每一片段视为相互独立的部分。
   Component,
+  // React.PureComponent 与 React.Component 几乎完全相同，但 React.PureComponent 通过prop和state的浅对比来实现 shouldComponentUpate()。
+  // 如果React组件的 render() 函数在给定相同的props和state下渲染为相同的结果，在某些场景下你可以使用 React.PureComponent 来提升性能。
+  // React.PureComponent 的 shouldComponentUpate() 会忽略整个组件的子级。确保所有的子级组件也是"Pure"的。
   PureComponent,
 
   createContext,
@@ -53,12 +58,33 @@ const React = {
   StrictMode: REACT_STRICT_MODE_TYPE,
   unstable_AsyncMode: REACT_ASYNC_MODE_TYPE,
 
+  // 在在开发或者非开发中以下方法有一些区别
+  
+  // React.createElement(
+  //   type,
+  //   [props],
+  //   [...children]
+  // )
+  // createElement 方法根据给定的类型创建并返回新的 React element 
   createElement: __DEV__ ? createElementWithValidation : createElement,
+  
+  // React.cloneElement(
+  //   element,
+  //   [props],
+  //   [...children]
+  // )
+  // cloneElement 方法以 element 作为起点，克隆并返回一个新的React元素(React Element)。生成的元素将会拥有原始元素props与新props的浅合并。新的子级会替换现有的子级。来自原始元素的 key 和 ref 将会保留。
   cloneElement: __DEV__ ? cloneElementWithValidation : cloneElement,
+  // React.createFactory(type)
+  // 根据给定的类型返回一个创建React元素的函数。类似 React.createElement ，参数type既可以一个html标签名称字符串，也可以是一个 React component 类型(一个类或时一个函数)。
+  // 推荐使用JSX或直接使用 React.createElement() 来替代它。
   createFactory: __DEV__ ? createFactoryWithValidation : createFactory,
-  isValidElement: isValidElement,
 
-  version: ReactVersion,
+  // React.isValidElement(object)
+  // 验证对象是否是一个React元素。返回 true 或 false 。
+  isValidElement: isValidElement,
+  // react 版本号
+  version: ReactVersion, 
 
   __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: {
     ReactCurrentOwner,
@@ -69,6 +95,7 @@ const React = {
 
 // 如果是在 开发环境下
 if (__DEV__) {
+  // Object.assign() 方法用于将所有可枚举属性的值从一个或多个源对象复制到目标对象。它将返回目标对象。
   Object.assign(React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED, {
     // These should not be included in production.
     ReactDebugCurrentFrame,
