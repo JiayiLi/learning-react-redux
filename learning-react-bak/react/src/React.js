@@ -36,12 +36,13 @@ import ReactDebugCurrentFrame from './ReactDebugCurrentFrame';
 // 定义一个对象，命名为 React ，上面挂在了所要暴露的所有方法，也就是 react 的所有方法。
 const React = {
   // react children 相关的方法
+  // 提供了处理 this.props.children 这个不透明数据结构的工具
   Children: {
     map, // React.Children.map(children, function[(thisArg)]) 在包含在 children 里的每个子级上调用函数，调用的函数的 this 设置为 thisArg 。如果 children 是一个嵌套的对象或数组，它将被遍历。如果 children 是 null 或 undefined ，返回 null 或 undefined 而不是一个空数组。
-    forEach,
-    count,
-    toArray,
-    only,
+    forEach,  // React.Children.forEach(children, function[(thisArg)]) 类似 React.Children.map() ，但是不返回数组。
+    count, //React.Children.count(children) 返回 children 中的组件总数，相等于传给 map 或 forEach 时，回调函数被调用次数。
+    toArray, // React.Children.toArray(children) 返回以赋key给每个子级 child 的扁平数组形式来组成不透明的 children 数据结构。如果你打算在你的渲染方法里操纵子级集合这很有用，特别是你想在 this.props.children 传下之前对它重新排序或切割。
+    only,  //React.Children.only(children) 返回children里仅有的子级。否则抛出异常。
   },
 
   createRef,
