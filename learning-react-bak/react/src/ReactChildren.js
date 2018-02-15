@@ -26,12 +26,21 @@ const SUBSEPARATOR = ':';
  * @param {string} key to be escaped.
  * @return {string} the escaped key.
  */
+// 转义和包装key，因此可以安全地用作 reactid
+// 参数：
+//    key 字符串，需要被转义
+// 返回：
+//    字符串，转义好的 key
 function escape(key) {
+  // 正则
   const escapeRegex = /[=:]/g;
   const escaperLookup = {
     '=': '=0',
     ':': '=2',
   };
+  // 使用'' + key 将 key 转换成字符串
+  // 然后匹配正则，输出匹配的部分赋值给 escapedString
+  // 将 key 中的 '=' 、 ':' 替换成 '=0'、'=2'
   const escapedString = ('' + key).replace(escapeRegex, function(match) {
     return escaperLookup[match];
   });

@@ -53,8 +53,20 @@ const React = {
   // React.PureComponent 的 shouldComponentUpate() 会忽略整个组件的子级。确保所有的子级组件也是"Pure"的。
   PureComponent,
 
+  // 新的组件类型：Provider 和 Consumer. Provider和Consumer成对出现，对于每一个 Provider 都有一个对应的 Consumer。
+  // 通过createContext方法创建 一对 Provider 和 Consumer
   createContext,
 
+  // React 中一个常见模式是为一个组件返回多个元素。Fragments 可以让你聚合一个子元素列表，并且不在DOM中增加额外节点。
+  // render() {
+  //   return (
+  //     <React.Fragment>
+  //       <ChildA />
+  //       <ChildB />
+  //       <ChildC />
+  //     </React.Fragment>
+  //   );
+  // }
   Fragment: REACT_FRAGMENT_TYPE,
   StrictMode: REACT_STRICT_MODE_TYPE,
   unstable_AsyncMode: REACT_ASYNC_MODE_TYPE,
