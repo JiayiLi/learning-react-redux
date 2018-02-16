@@ -31,6 +31,8 @@ const SUBSEPARATOR = ':';
 //    key 字符串，需要被转义
 // 返回：
 //    字符串，转义好的 key
+// 例子：
+// escape("lll=ddd:hhh333jjjj") --> "$lll=0ddd=2hhh333jjjj"
 function escape(key) {
   // 正则
   const escapeRegex = /[=:]/g;
@@ -45,6 +47,7 @@ function escape(key) {
     return escaperLookup[match];
   });
 
+  // 加上 $ 并返回
   return '$' + escapedString;
 }
 
@@ -55,8 +58,17 @@ function escape(key) {
 
 let didWarnAboutMaps = false;
 
+// 对 用户自己提供的 key 进行转义
+// 转义正则
 const userProvidedKeyEscapeRegex = /\/+/g;
+// 进行转义，
+// 如果text 中有 / 则 在 / 后再插入一个 /
+// 例子：
+// escapeUserProvidedKey("ll//ddd/jjj\j") --> "ll///ddd//jjjj"
 function escapeUserProvidedKey(text) {
+  // replace 方法:https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/replace
+  // 用第二个参数替换第一个参数匹配到的字符串
+  // 第二个参数中  ‘$&’	插入匹配的子串。
   return ('' + text).replace(userProvidedKeyEscapeRegex, '$&/');
 }
 
