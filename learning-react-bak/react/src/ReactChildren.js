@@ -392,6 +392,7 @@ function countChildren(children, context) {
  *
  * See https://reactjs.org/docs/react-api.html#react.children.toarray
  */
+// 将 children 对象变成一个数组
 function toArray(children) {
   const result = [];
   mapIntoWithKeyPrefixInternal(
@@ -417,6 +418,7 @@ function toArray(children) {
  * @return {ReactElement} The first and only `ReactElement` contained in the
  * structure.
  */
+// 验证集合中是否只有一个子集，并将其返回。
 function onlyChild(children) {
   invariant(
     isValidElement(children),
